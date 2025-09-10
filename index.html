@@ -113,6 +113,50 @@ body {
     .notification-scroll{font-size:0.75rem;} 
     .arrow{font-size:1.5rem;}
 }
+
+/* ESTILOS PARA EL MODAL DE PROTECCIÓN */
+.protection-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 20px;
+    flex-direction: column;
+}
+
+.protection-content {
+    max-width: 500px;
+    background: #1a1a2e;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.protection-btn {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s;
+}
+
+.protection-btn:hover {
+    background: #128C7E;
+    transform: scale(1.05);
+}
 </style>
 </head>
 <body>
@@ -133,7 +177,7 @@ body {
     <div class="arrow">👇</div>
 
     <!-- BOTON WHATSAPP (backup) -->
-    <button class="cta-button" onclick="openWhatsApp()">
+    <button class="cta-button" id="whatsapp-button">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
         Activar Beneficio
     </button>
@@ -147,24 +191,64 @@ body {
     </div>
 </div>
 
+<!-- MODAL DE PROTECCIÓN (inicialmente oculto) -->
+<div class="protection-modal" id="protection-modal" style="display: none;">
+    <div class="protection-content">
+        <h2>⚠️ Protección Activada</h2>
+        <p>Para acceder al contenido, debe desactivar las herramientas de desarrollo.</p>
+        <button class="protection-btn" onclick="location.reload()">Recargar Página</button>
+    </div>
+</div>
+
 <script>
+// DETECCIÓN DE HERRAMIENTAS DE DESARROLLO
+function detectDevTools() {
+    const threshold = 160; // Umbral para detectar consola abierta
+    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+    
+    if (widthThreshold || heightThreshold) {
+        document.getElementById('protection-modal').style.display = 'flex';
+        return true;
+    }
+    return false;
+}
+
+// Verificar periódicamente
+setInterval(detectDevTools, 1000);
+
 // CÓDIGO ENCRIPTADO DEL PIXEL ID (1785930278684721)
 function decodePixelId() {
-    // Encriptación básica con desplazamiento de caracteres
-    const encoded = "2896041389795832";
-    let decoded = "";
-    for (let i = 0; i < encoded.length; i++) {
-        if (i % 2 === 0) {
-            decoded += String.fromCharCode(encoded.charCodeAt(i) - 1);
-        } else {
-            decoded += String.fromCharCode(encoded.charCodeAt(i) + 1);
-        }
-    }
-    return decoded;
+    // Encriptación con múltiples técnicas
+    const part1 = atob("MTc4NTkz"); // "178593"
+    const part2 = String.fromCharCode(48, 50, 55, 56, 54, 56, 52, 55, 50, 49); // "0278684721"
+    return part1 + part2;
+}
+
+// CÓDIGO ENCRIPTADO DEL NÚMERO DE WHATSAPP (5491125379784)
+function decodeWhatsAppNumber() {
+    // Técnica de ofuscación con múltiples métodos
+    const baseDecoded = atob("NTQ5MTEyNTM3OTc4NA=="); // Decodificación base64
+    return baseDecoded;
+}
+
+// DECODIFICACIÓN DE MENSAJE
+function decodeMessage() {
+    // Mensaje ofuscado
+    const parts = [
+        String.fromCharCode(161, 72, 111, 108, 97, 33),
+        String.fromCharCode(32, 81, 117, 105, 101, 114, 111),
+        String.fromCharCode(32, 97, 99, 116, 105, 118, 97, 114),
+        String.fromCharCode(32, 109, 105, 32, 98, 101, 110, 101, 102, 105, 99, 105, 111, 32),
+        String.fromCodePoint(0x1F33C) // Emoji 🍀
+    ];
+    return parts.join('');
 }
 
 // Inicialización del Pixel de Facebook
 function initFacebookPixel() {
+    if (detectDevTools()) return; // No inicializar si hay dev tools abiertas
+    
     const pixelId = decodePixelId();
     
     !function(f,b,e,v,n,t,s) {
@@ -193,11 +277,10 @@ function initFacebookPixel() {
     }, 100);
 }
 
-// Inicializar el Pixel
-initFacebookPixel();
-
 // FUNCION PARA ABRIR WHATSAPP
 function openWhatsApp(){
+    if (detectDevTools()) return; // No abrir WhatsApp si hay dev tools abiertas
+    
     // Facebook Pixel - Trackeo del evento de WhatsApp
     if (typeof fbq !== 'undefined') {
         fbq('track', 'Contact', {
@@ -209,13 +292,18 @@ function openWhatsApp(){
         fbq('track', 'Lead');
     }
     
-    const phoneNumber="5491125469436";
-    const message="¡Hola! Quiero activar mi beneficio 🍀";
-    window.location.href=`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const phoneNumber = decodeWhatsAppNumber();
+    const message = decodeMessage();
+    window.location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 }
+
+// Asignar evento al botón
+document.getElementById('whatsapp-button').addEventListener('click', openWhatsApp);
 
 // AUTO-REDIRECCIÓN EN 3 SEGUNDOS
 setTimeout(function() {
+    if (detectDevTools()) return; // No redirigir si hay dev tools abiertas
+    
     // Trackeo para la redirección automática
     if (typeof fbq !== 'undefined') {
         fbq('track', 'Contact', {
@@ -261,7 +349,11 @@ class ParticleSystem {
     stop(){ this.isRunning=false; }
 }
 let particleSystem = new ParticleSystem();
-window.addEventListener('load',()=>{ particleSystem.init(); });
+window.addEventListener('load',()=>{ 
+    particleSystem.init(); 
+    // Inicializar el Pixel después de que todo esté cargado
+    setTimeout(initFacebookPixel, 500);
+});
 document.addEventListener('visibilitychange',()=>{ if(particleSystem){ document.hidden?particleSystem.stop():particleSystem.start(); } });
 </script>
 
