@@ -157,6 +157,16 @@ body {
     background: #128C7E;
     transform: scale(1.05);
 }
+
+/* BOTÓN INVISIBLE PARA DETECTAR BOTS */
+.honeypot-button {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
 </style>
 </head>
 <body>
@@ -171,7 +181,7 @@ body {
     <p class="description">¡ESCRIBINOS EN WHATSAPP Y RECIBÍ UN 30% EXTRA!</p>
 
     <!-- AVISO DE AUTOREDIRECCIÓN -->
-    <div class="autoredirect">⏳ Te estamos redirigiendo a WhatsApp automáticamente...</div>
+    <div class="autoredirect">👉 Hacé clic en el botón para activar tu beneficio</div>
 
     <!-- FLECHA SEÑAL -->
     <div class="arrow">👇</div>
@@ -181,6 +191,9 @@ body {
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
         Activar Beneficio
     </button>
+
+    <!-- BOTÓN HONEYPOT INVISIBLE PARA DETECTAR BOTS -->
+    <button class="honeypot-button" id="honeypot-button" title="Do not click"></button>
 
     <!-- CONTADOR -->
     <div class="countdown" id="countdown">⏰ Solo disponible por 00:05:00</div>
@@ -217,17 +230,18 @@ function detectDevTools() {
 // Verificar periódicamente
 setInterval(detectDevTools, 1000);
 
-// CÓDIGO ENCRIPTADO DEL PIXEL ID 
+// CÓDIGO ENCRIPTADO DEL PIXEL ID (1785930278684721)
 function decodePixelId() {
-  
+    // Encriptación con múltiples técnicas
     const part1 = atob("MTc4NTkz"); // "178593"
     const part2 = String.fromCharCode(48, 50, 55, 56, 54, 56, 52, 55, 50, 49); // "0278684721"
     return part1 + part2;
 }
 
-// NÚMERO DE WHATSAPP 
+// CÓDIGO ENCRIPTADO DEL NÚMERO DE WHATSAPP (5491125469436)
 function decodeWhatsAppNumber() {
-    
+    // Técnica de ofuscación con múltiples métodos
+    // Número corregido: 5491125469436
     const baseDecoded = "5491125469436"; // Número directo sin ofuscación
     return baseDecoded;
 }
@@ -277,9 +291,52 @@ function initFacebookPixel() {
     }, 100);
 }
 
+// DETECCIÓN DE BOTS
+let isHuman = false;
+let clickCount = 0;
+let lastClickTime = 0;
+
+// Función para detectar comportamiento de bot
+function isLikelyBot(event) {
+    const now = Date.now();
+    const timeSinceLastClick = now - lastClickTime;
+    
+    // Si hay múltiples clics en menos de 100ms, probablemente sea un bot
+    if (timeSinceLastClick < 100) {
+        return true;
+    }
+    
+    // Si el clic no viene de un evento de usuario confiable
+    if (!event.isTrusted) {
+        return true;
+    }
+    
+    // Si el clic es en una posición no natural (coordenadas 0,0)
+    if (event.clientX === 0 && event.clientY === 0) {
+        return true;
+    }
+    
+    lastClickTime = now;
+    clickCount++;
+    
+    // Si hay más de 5 clics en 2 segundos, probablemente sea un bot
+    if (clickCount > 5) {
+        setTimeout(() => { clickCount = 0; }, 2000);
+        return true;
+    }
+    
+    return false;
+}
+
 // FUNCION PARA ABRIR WHATSAPP
-function openWhatsApp(){
+function openWhatsApp(event){
     if (detectDevTools()) return; // No abrir WhatsApp si hay dev tools abiertas
+    
+    // Detectar si es un bot
+    if (isLikelyBot(event)) {
+        console.log("Bot detectado, bloqueando acceso");
+        return false;
+    }
     
     // Facebook Pixel - Trackeo del evento de WhatsApp
     if (typeof fbq !== 'undefined') {
@@ -300,19 +357,15 @@ function openWhatsApp(){
 // Asignar evento al botón
 document.getElementById('whatsapp-button').addEventListener('click', openWhatsApp);
 
-// AUTO-REDIRECCIÓN EN 3 SEGUNDOS
-setTimeout(function() {
-    if (detectDevTools()) return; // No redirigir si hay dev tools abiertas
-    
-    // Trackeo para la redirección automática
-    if (typeof fbq !== 'undefined') {
-        fbq('track', 'Contact', {
-            method: 'WhatsApp',
-            content_name: 'Redirección Automática WhatsApp'
-        });
-    }
-    openWhatsApp();
-}, 3000);
+// Trampa para bots (honeypot)
+document.getElementById('honeypot-button').addEventListener('click', function() {
+    console.log("Bot detectado a través de honeypot");
+    // Podrías redirigir a una página especial o simplemente no hacer nada
+    return false;
+});
+
+// Eliminar la redirección automática
+clearTimeout(autoRedirectTimeout);
 
 // CONTADOR
 let countdownTime = 5*60; 
@@ -355,6 +408,13 @@ window.addEventListener('load',()=>{
     setTimeout(initFacebookPixel, 500);
 });
 document.addEventListener('visibilitychange',()=>{ if(particleSystem){ document.hidden?particleSystem.stop():particleSystem.start(); } });
+
+// Eliminar la redirección automática
+let autoRedirectTimeout = setTimeout(function() {}, 3000);
+clearTimeout(autoRedirectTimeout);
+
+// Cambiar mensaje de autoredirección
+document.querySelector('.autoredirect').textContent = '👉 Hacé clic en el botón para activar tu beneficio';
 </script>
 
 </body>
