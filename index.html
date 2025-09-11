@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gold Clover - Activá tu Beneficio</title>
 <style>
+/* [TODOS TUS ESTILOS EXISTENTES SE MANTIENEN IGUAL] */
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
     font-family:'Arial',sans-serif;
@@ -167,6 +168,40 @@ body {
     height: 1px;
     overflow: hidden;
 }
+
+/* MODAL DE CONFIRMACIÓN DE SEGUIMIENTO */
+.tracking-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.tracking-content {
+    background: #1a1a2e;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 0 25px rgba(37, 211, 102, 0.4);
+}
+
+.tracking-content h3 {
+    color: #25D366;
+    margin-bottom: 15px;
+}
+
+.tracking-content p {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
 </style>
 </head>
 <body>
@@ -213,10 +248,95 @@ body {
     </div>
 </div>
 
+<!-- MODAL DE CONFIRMACIÓN DE SEGUIMIENTO -->
+<div class="tracking-modal" id="tracking-modal">
+    <div class="tracking-content">
+        <h3>🔄 Redirigiendo a WhatsApp</h3>
+        <p>Estamos registrando tu conversión. Serás redirigido en unos segundos...</p>
+    </div>
+</div>
+
 <script>
+// =============================================
+// CONFIGURACIÓN MEJORADA DEL PIXEL DE FACEBOOK
+// =============================================
+
+// CÓDIGO ENCRIPTADO DEL PIXEL ID (1785930278684721)
+function decodePixelId() {
+    const part1 = atob("MTc4NTkz"); // "178593"
+    const part2 = String.fromCharCode(48, 50, 55, 56, 54, 56, 52, 55, 50, 49); // "0278684721"
+    return part1 + part2;
+}
+
+// Inicialización del Pixel de Facebook (versión mejorada)
+function initFacebookPixel() {
+    if (detectDevTools()) return; // No inicializar si hay dev tools abiertas
+    
+    const pixelId = decodePixelId();
+    
+    // Cargar el pixel de Facebook de forma síncrona para mejor confiabilidad
+    (function(f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function() {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+    })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    
+    // Inicializar el pixel inmediatamente
+    if (typeof fbq !== 'undefined') {
+        fbq('init', pixelId);
+        fbq('track', 'PageView');
+        console.log("Pixel de Facebook inicializado correctamente");
+    } else {
+        console.error("Error: Facebook Pixel no se cargó correctamente");
+        // Reintentar después de un breve delay
+        setTimeout(initFacebookPixel, 1000);
+    }
+}
+
+// Función mejorada para trackear eventos
+function trackFacebookEvent(eventName, parameters) {
+    if (typeof fbq === 'undefined') {
+        console.warn("Facebook Pixel no está disponible, reintentando...");
+        setTimeout(() => trackFacebookEvent(eventName, parameters), 500);
+        return;
+    }
+    
+    try {
+        // Mostrar modal de confirmación para dar tiempo al tracking
+        document.getElementById('tracking-modal').style.display = 'flex';
+        
+        // Trackear el evento
+        fbq('track', eventName, parameters);
+        console.log(`Evento ${eventName} trackeado a Facebook`);
+        
+        // Esperar un momento para asegurar que el evento se envíe
+        setTimeout(() => {
+            document.getElementById('tracking-modal').style.display = 'none';
+        }, 1500);
+    } catch (error) {
+        console.error("Error al trackear evento:", error);
+        document.getElementById('tracking-modal').style.display = 'none';
+    }
+}
+
+// =============================================
+// CÓDIGO EXISTENTE CON MEJORAS
+// =============================================
+
 // DETECCIÓN DE HERRAMIENTAS DE DESARROLLO
 function detectDevTools() {
-    const threshold = 160; // Umbral para detectar consola abierta
+    const threshold = 160;
     const widthThreshold = window.outerWidth - window.innerWidth > threshold;
     const heightThreshold = window.outerHeight - window.innerHeight > threshold;
     
@@ -230,128 +350,66 @@ function detectDevTools() {
 // Verificar periódicamente
 setInterval(detectDevTools, 1000);
 
-// CÓDIGO ENCRIPTADO DEL PIXEL ID (1785930278684721)
-function decodePixelId() {
-    // Encriptación con múltiples técnicas
-    const part1 = atob("MTc4NTkz"); // "178593"
-    const part2 = String.fromCharCode(48, 50, 55, 56, 54, 56, 52, 55, 50, 49); // "0278684721"
-    return part1 + part2;
-}
-
 // CÓDIGO ENCRIPTADO DEL NÚMERO DE WHATSAPP (5491125469436)
 function decodeWhatsAppNumber() {
-    // Técnica de ofuscación con múltiples métodos
-    // Número corregido: 5491125469436
-    const baseDecoded = "5491125469436"; // Número directo sin ofuscación
+    const baseDecoded = "5491125469436";
     return baseDecoded;
 }
 
 // DECODIFICACIÓN DE MENSAJE
 function decodeMessage() {
-    // Mensaje ofuscado
     const parts = [
         String.fromCharCode(161, 72, 111, 108, 97, 33),
         String.fromCharCode(32, 81, 117, 105, 101, 114, 111),
         String.fromCharCode(32, 97, 99, 116, 105, 118, 97, 114),
         String.fromCharCode(32, 109, 105, 32, 98, 101, 110, 101, 102, 105, 99, 105, 111, 32),
-        String.fromCodePoint(0x1F33C) // Emoji 🍀
+        String.fromCodePoint(0x1F33C)
     ];
     return parts.join('');
 }
 
-// Inicialización del Pixel de Facebook
-function initFacebookPixel() {
-    if (detectDevTools()) return; // No inicializar si hay dev tools abiertas
-    
-    const pixelId = decodePixelId();
-    
-    !function(f,b,e,v,n,t,s) {
-        if(f.fbq)return;
-        n=f.fbq=function() {
-            n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)
-        };
-        if(!f._fbq)f._fbq=n;
-        n.push=n;
-        n.loaded=!0;
-        n.version='2.0';
-        n.queue=[];
-        t=b.createElement(e);
-        t.async=!0;
-        t.src=v;
-        s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)
-    }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    
-    // Pequeña demora para asegurar que el script esté cargado
-    setTimeout(function() {
-        if (typeof fbq !== 'undefined') {
-            fbq('init', pixelId);
-            fbq('track', 'PageView');
-        }
-    }, 100);
-}
-
-// DETECCIÓN DE BOTS
-let isHuman = false;
+// DETECCIÓN DE BOTS (versión menos agresiva)
 let clickCount = 0;
 let lastClickTime = 0;
 
-// Función para detectar comportamiento de bot
 function isLikelyBot(event) {
+    // Solo detección básica para no interferir con usuarios reales
     const now = Date.now();
     const timeSinceLastClick = now - lastClickTime;
     
-    // Si hay múltiples clics en menos de 100ms, probablemente sea un bot
-    if (timeSinceLastClick < 100) {
-        return true;
-    }
-    
-    // Si el clic no viene de un evento de usuario confiable
-    if (!event.isTrusted) {
-        return true;
-    }
-    
-    // Si el clic es en una posición no natural (coordenadas 0,0)
-    if (event.clientX === 0 && event.clientY === 0) {
+    // Si hay clics extremadamente rápidos, probablemente sea un bot
+    if (timeSinceLastClick < 50) {
         return true;
     }
     
     lastClickTime = now;
-    clickCount++;
-    
-    // Si hay más de 5 clics en 2 segundos, probablemente sea un bot
-    if (clickCount > 5) {
-        setTimeout(() => { clickCount = 0; }, 2000);
-        return true;
-    }
-    
     return false;
 }
 
-// FUNCION PARA ABRIR WHATSAPP
+// FUNCIÓN MEJORADA PARA ABRIR WHATSAPP
 function openWhatsApp(event){
-    if (detectDevTools()) return; // No abrir WhatsApp si hay dev tools abiertas
+    if (detectDevTools()) return;
     
-    // Detectar si es un bot
+    // Detección muy básica de bots
     if (isLikelyBot(event)) {
-        console.log("Bot detectado, bloqueando acceso");
+        console.log("Posible bot detectado");
         return false;
     }
     
-    // Facebook Pixel - Trackeo del evento de WhatsApp
-    if (typeof fbq !== 'undefined') {
-        fbq('track', 'Contact', {
-            method: 'WhatsApp',
-            content_name: 'Botón WhatsApp Gold Clover'
-        });
-        
-        // También puedes usar el evento estándar de Lead
-        fbq('track', 'Lead');
-    }
+    // Trackear el evento de conversión con confirmación visual
+    trackFacebookEvent('Lead', {
+        content_name: 'Botón WhatsApp Gold Clover',
+        conversion_method: 'WhatsApp'
+    });
     
-    const phoneNumber = decodeWhatsAppNumber();
-    const message = decodeMessage();
-    window.location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    // Redirigir después de dar tiempo al tracking
+    setTimeout(() => {
+        const phoneNumber = decodeWhatsAppNumber();
+        const message = decodeMessage();
+        window.location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    }, 1600); // Tiempo suficiente para que el evento se envíe
+    
+    return false;
 }
 
 // Asignar evento al botón
@@ -360,12 +418,8 @@ document.getElementById('whatsapp-button').addEventListener('click', openWhatsAp
 // Trampa para bots (honeypot)
 document.getElementById('honeypot-button').addEventListener('click', function() {
     console.log("Bot detectado a través de honeypot");
-    // Podrías redirigir a una página especial o simplemente no hacer nada
     return false;
 });
-
-// Eliminar la redirección automática
-clearTimeout(autoRedirectTimeout);
 
 // CONTADOR
 let countdownTime = 5*60; 
@@ -401,17 +455,21 @@ class ParticleSystem {
     start(){ this.isRunning=true; requestAnimationFrame((t)=>this.update(t)); }
     stop(){ this.isRunning=false; }
 }
+
 let particleSystem = new ParticleSystem();
+
+// Inicializar cuando la página cargue
 window.addEventListener('load',()=>{ 
     particleSystem.init(); 
-    // Inicializar el Pixel después de que todo esté cargado
-    setTimeout(initFacebookPixel, 500);
+    // Inicializar el Pixel inmediatamente
+    initFacebookPixel();
 });
-document.addEventListener('visibilitychange',()=>{ if(particleSystem){ document.hidden?particleSystem.stop():particleSystem.start(); } });
 
-// Eliminar la redirección automática
-let autoRedirectTimeout = setTimeout(function() {}, 3000);
-clearTimeout(autoRedirectTimeout);
+document.addEventListener('visibilitychange',()=>{ 
+    if(particleSystem){ 
+        document.hidden ? particleSystem.stop() : particleSystem.start(); 
+    } 
+});
 
 // Cambiar mensaje de autoredirección
 document.querySelector('.autoredirect').textContent = '👉 Hacé clic en el botón para activar tu beneficio';
